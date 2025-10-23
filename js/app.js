@@ -30,8 +30,8 @@ function initNavigation() {
                     console.log('[Navigation] Hiding page:', page.id);
                 }
                 page.classList.remove('active');
-                // Force hide with inline style
-                page.style.display = 'none';
+                // Force hide with inline style - use setProperty for !important
+                page.style.setProperty('display', 'none', 'important');
             });
             
             // Add active class to clicked nav item
@@ -45,10 +45,11 @@ function initNavigation() {
             
             if (targetPage) {
                 targetPage.classList.add('active');
-                // Force show with inline style
-                targetPage.style.display = 'block';
+                // Force show with inline style - use setProperty for !important
+                targetPage.style.setProperty('display', 'block', 'important');
                 console.log('[Navigation] Showing page:', pageId + '-page');
                 console.log('[Navigation] Page display style:', targetPage.style.display);
+                console.log('[Navigation] Page computed display:', window.getComputedStyle(targetPage).display);
                 
                 // Refresh Dashboard when navigating to it (Chunk 5)
                 if (pageId === 'dashboard' && window.dashboardUI) {
@@ -644,6 +645,41 @@ document.addEventListener('DOMContentLoaded', () => {
     // This ensures content is ready when user navigates to settings
     console.log('[App] Rendering settings content on page load...');
     settingsUI.renderSettings();
+    
+    // Ensure dashboard is visible on page load
+    const dashboardPage = document.getElementById('dashboard-page');
+    if (dashboardPage) {
+        dashboardPage.style.setProperty('display', 'block', 'important');
+        console.log('[App] Dashboard page display set to block');
+    }
+    
+    // Add visible debug indicator
+    const debugDiv = document.createElement('div');
+    debugDiv.id = 'debug-indicator';
+    debugDiv.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: #17bf63;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 999999;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    `;
+    debugDiv.textContent = '✓ App Loaded';
+    document.body.appendChild(debugDiv);
+    
+    // Update debug indicator when navigating
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('nav-item')) {
+            const pageName = e.target.dataset.page;
+            debugDiv.textContent = `✓ Current: ${pageName}`;
+            debugDiv.style.background = '#1da1f2';
+        }
+    });
     
     console.log('✅ Icebreaking Machine - Ready!');
     
