@@ -9,6 +9,36 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/chunk5-styles.css">
     <link rel="stylesheet" href="css/settings.css">
+    <!-- ✅ HOTFIX CSS: add right after <link rel="stylesheet" href="css/settings.css"> -->
+<style id="hotfix-visibility-css">
+/* Keep Settings/Results/Feedback visible */
+#settings-page, #results-page, #feedback-page,
+#settings-content, #results-table, #feedback-page .feedback-container {
+  display:block!important; visibility:visible!important; opacity:1!important;
+  height:auto!important; max-height:none!important; position:relative!important; z-index:2!important;
+  content-visibility:visible!important; contain:none!important; filter:none!important; transform:none!important;
+  pointer-events:auto!important;
+}
+
+/* Only active tabs show */
+.settings-tab-content { display:none!important; height:auto!important; max-height:none!important; overflow:visible!important; }
+.settings-tab-content.active { display:block!important; min-height:240px; position:relative!important; z-index:3!important; }
+
+/* Kill stale overlays/backdrops if any remain mounted */
+.page-overlay, .loading-overlay, .modal-backdrop, #loading, #spinner,
+[role="dialog"][aria-hidden="true"], [data-overlay], .overlay, .backdrop {
+  opacity:0!important; visibility:hidden!important; pointer-events:none!important; display:none!important;
+}
+
+/* Let children grow even if a parent uses flex/grid */
+.main-content, .page, .panel-content, #settings-content {
+  min-height:0!important; height:auto!important; max-height:none!important; overflow:visible!important;
+}
+
+/* Debug outline to confirm you can see the active panel bounds */
+.settings-tab-content.active { outline:2px dashed rgba(0,128,255,.25); }
+</style>
+
 </head>
 <body>
     <!-- Sidebar Navigation -->
@@ -652,5 +682,155 @@ Jane Doe,XYZ Realty,Broker,Atlanta GA,https://linkedin.com/in/janedoe</pre>
     <script src="js/ai-client.js"></script>
     <script src="js/icebreaker-engine.js"></script>
     <script src="js/app.js"></script>
+    <!-- ✅ HOTFIX JS: add right after <script src="js/app.js"></script> -->
+<script id="hotfix-visibility-js">
+(function () {
+  const log = (...a) => console.debug('[hotfix]', ...a);
+
+  function killStaleOverlays(root=document){
+    const sel=[
+      '.page-overlay','.loading-overlay','.modal-backdrop','#loading','#spinner',
+      '[data-overlay]','.overlay','.backdrop','[aria-busy="true"]'
+    ].join(',');
+    root.querySelectorAll(sel).forEach(el=>{
+      el.style.setProperty('opacity','0','important');
+      el.style.setProperty('visibility','hidden','important');
+      el.style.setProperty('pointer-events','none','important');
+      el.style.setProperty('display','none','important');
+      el.removeAttribute('aria-busy');
+    });
+  }
+
+  function liftZeroHeights(el){
+    let cur=el;
+    while(cur && cur!==document.body){
+      const cs=getComputedStyle(cur);
+      if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0){
+        cur.style.setProperty('display','block','important');
+        cur.style.setProperty('visibility','visible','important');
+        cur.style.setProperty('opacity','1','important');
+      }
+      if(cs.height==='0px'||cs.maxHeight==='0px'||cs.overflow==='hidden'||cs.overflow==='clip'){
+        cur.style.setProperty('height','auto','important');
+        cur.style.setProperty('max-height','none','important');
+        cur.style.setProperty('overflow','visible','important');
+      }
+      if (cs.contentVisibility && cs.contentVisibility!=='visible') {
+        cur.style.setProperty('content-visibility','visible','important');
+      }
+      if (cs.contain && cs.contain!=='none') {
+        cur.style.setProperty('contain','none','important');
+      }
+      cur=cur.parentElement;
+    }
+  }
+
+  function reveal(el){
+    if(!el) return;
+    el.removeAttribute('hidden'); el.removeAttribute('aria-hidden');
+    el.style.setProperty('display','block','important');
+    el.style.setProperty('visibility','visible','important');
+    el.style.setProperty('opacity','1','important');
+    el.style.setProperty('pointer-events','auto','important');
+    el.style.setProperty('position','relative','important');
+    el.style.setProperty('z-index','999','important');
+    liftZeroHeights(el);
+    if(el.clientHeight<24 && el.scrollHeight>100){
+      el.style.setProperty('height','auto','important');
+      el.style.setProperty('max-height','none','important');
+      el.style.removeProperty('transition'); // avoid re-collapse animations
+    }
+  }
+
+  function ensureAppVisible(){
+    killStaleOverlays();
+
+    // Prefer active settings tab; else results/feedback containers
+    const active = document.querySelector(
+      '.settings-tab-content.active'
+    ) || document.querySelector('#results-table, #settings-content, #feedback-page .feedback-container');
+
+    if(!active) return;
+    reveal(active);
+
+    // If something still covers it, mute that thing
+    const r = active.getBoundingClientRect();
+    const cx = Math.max(r.left+8, Math.min(r.right-8, (r.left+r.right)/2));
+    const cy = Math.max(r.top+8, Math.min(r.bottom-8, (r.top+r.bottom)/2));
+    const hit = document.elementFromPoint(cx, cy);
+    if(hit && !active.contains(hit)){
+      hit.style.setProperty('pointer-events','none','important');
+      hit.style.setProperty('opacity','0','important');
+      hit.style.setProperty('visibility','hidden','important');
+      hit.style.setProperty('z-index','0','important');
+      killStaleOverlays();
+      reveal(active);
+    }
+
+    // brief outline so you can see it light up
+    const prev=active.style.outline;
+    active.style.outline='3px solid rgba(255,0,0,.35)';
+    setTimeout(()=>active.style.outline=prev||'',1200);
+  }
+
+  // ---- Wire your existing UI ----
+
+  // Sidebar page navigation: uses .nav-item with data-page="settings|results|feedback|dashboard|research"
+  function wirePages(){
+    const pages = Array.from(document.querySelectorAll('.page'));
+    const byKey = new Map(pages.map(p=>[p.id.replace('-page',''), p]));
+    function show(key){
+      pages.forEach(p => p.style.display = 'none');
+      const target = byKey.get(key);
+      if(target){ target.style.display = 'block'; target.classList.add('active'); }
+      ensureAppVisible();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    document.querySelectorAll('.nav-item[data-page]').forEach(link=>{
+      link.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const key = link.getAttribute('data-page'); // e.g., "settings"
+        document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n===link));
+        show(key);
+      });
+    });
+  }
+
+  // Settings tabs: buttons .settings-tab-btn[data-tab="basics|writing-style|ai-prompts|billing"]
+  // Panels have data-tab-content="basics|writing-style|ai-prompts|billing"
+  function wireSettingsTabs(){
+    const buttons = document.querySelectorAll('.settings-tab-btn[data-tab]');
+    const panels  = document.querySelectorAll('.settings-tab-content[data-tab-content]');
+    function activate(key){
+      buttons.forEach(b=>b.classList.toggle('active', b.getAttribute('data-tab')===key));
+      panels.forEach(p=>{
+        const match = p.getAttribute('data-tab-content')===key;
+        p.classList.toggle('active', match);
+        if(match){ reveal(p); }
+      });
+      ensureAppVisible();
+    }
+    buttons.forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const key = btn.getAttribute('data-tab');
+        activate(key);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    wirePages();
+    wireSettingsTabs();
+    ensureAppVisible();
+  });
+  window.addEventListener('load', ensureAppVisible);
+
+  // If other scripts toggle classes later, defend visibility
+  const mo=new MutationObserver(()=>ensureAppVisible());
+  mo.observe(document.documentElement,{attributes:true,subtree:true,attributeFilter:['class','style','hidden','aria-hidden']});
+
+  console.log('✓ App Loaded');
+})();
+</script>
 </body>
 </html>
