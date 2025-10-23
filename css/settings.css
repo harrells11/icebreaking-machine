@@ -1,21 +1,28 @@
-/* ================================
-   Icebreaking Machine — settings.css
-   Safe full overwrite
-   Purpose: Ensure tab content renders visibly
-   ================================ */
+/* =========================================
+   Icebreaking Machine — settings.css (v2)
+   Goal: Make Settings/Results/Feedback visible
+   Strategy: Display-only tab toggling, no opacity/visibility tricks
+   ========================================= */
 
-/* ---------- SETTINGS ROOT ---------- */
+/* ---------- ROOT CONTAINER ---------- */
 #settings-content {
   display: block !important;
+  position: relative;
+  z-index: 1;
+  background: #ffffff;       /* ensure contrast */
+  color: #111;               /* readable text */
   height: auto !important;
   max-height: none !important;
-  min-height: 420px;           /* guarantees visibility even if panel is short */
-  overflow: visible;
+  min-height: 480px;         /* visible even if panel is short */
   box-sizing: border-box;
+  font-size: 16px;           /* guard against parent font-size:0 */
+  filter: none !important;   /* neutralize accidental opacity filters */
 }
 
-/* Optional layout polish (safe defaults) */
-#settings-content .settings-inner {
+/* Optional layout wrapper if present */
+#settings-content .settings-inner,
+#settings-content .container,
+#settings-content .content {
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
@@ -23,61 +30,52 @@
   box-sizing: border-box;
 }
 
-/* ---------- TABS: BASE STATE ---------- */
+/* ---------- TAB AREAS CAN GROW ---------- */
 .settings-tabs,
 .settings-tab-panels,
 .tab-panels,
 .tab-content-wrapper {
+  display: block !important;
   height: auto !important;
   max-height: none !important;
-  overflow: visible;
-  box-sizing: border-box;
+  overflow: visible !important;
 }
 
+/* ---------- PANELS: BASE (HIDDEN) ----------
+   Keep this SIMPLE: we only toggle display.
+   No opacity, no visibility, no max-height animations.
+*/
 .settings-tab-content,
 .tab-panel,
 .library-tab-content,
 .feedback-tab-content {
-  display: none;               /* hidden by default */
-  height: auto;                /* never collapse to 0 */
-  max-height: none;
-  overflow: visible;
-  opacity: 0;
-  visibility: hidden;
-  box-sizing: border-box;
+  display: none !important;   /* hidden by default */
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
-/* ---------- TABS: ACTIVE STATE ---------- */
+/* ---------- PANELS: ACTIVE (VISIBLE) ---------- */
 .settings-tab-content.active,
 .tab-panel.active,
 .library-tab-content.active,
 .feedback-tab-content.active {
-  display: block !important;   /* ensure visible even if JS toggles display */
+  display: block !important;
   height: auto !important;
   max-height: none !important;
-  min-height: 240px;           /* prevents zero-height flicker */
-  opacity: 1;
-  visibility: visible;
+  min-height: 260px;
+  background: transparent;
 }
 
-/* ---------- OPTIONAL: SMOOTH OPEN (safe) ----------
-   If you want a simple expand feel without height bugs,
-   we animate opacity only. Remove if undesired. */
-.settings-tab-content,
-.tab-panel,
-.library-tab-content,
-.feedback-tab-content {
-  transition: opacity 180ms ease-in-out, visibility 0s linear 0s;
+/* ---------- HARD VISIBILITY GUARDS INSIDE ACTIVE PANELS ---------- */
+.settings-tab-content.active,
+.settings-tab-content.active * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
 }
 
-.settings-tab-content:not(.active),
-.tab-panel:not(.active),
-.library-tab-content:not(.active),
-.feedback-tab-content:not(.active) {
-  transition: opacity 120ms ease-in-out, visibility 0s linear 120ms;
-}
-
-/* ---------- FORMS & SCROLLING ---------- */
+/* ---------- FORMS & BASICS ---------- */
 #settings-content form,
 #settings-content .form-section {
   width: 100%;
@@ -86,32 +84,8 @@
   overflow: visible;
 }
 
-#settings-content .scroll-area {
-  overflow: auto;              /* only areas that should scroll */
-  max-height: 70vh;            /* adjust as you like */
-  -webkit-overflow-scrolling: touch;
-}
-
-/* ---------- BASIC TYPOGRAPHY (safe) ---------- */
-#settings-content h1,
-#settings-content h2,
-#settings-content h3 {
-  margin: 0 0 12px;
-}
-
-#settings-content p {
-  margin: 0 0 10px;
-}
-
-#settings-content .field {
-  margin: 10px 0 16px;
-}
-
-#settings-content label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
+#settings-content label { display: block; font-weight: 600; margin: 8px 0 6px; }
+#settings-content .field { margin: 10px 0 16px; }
 
 #settings-content input,
 #settings-content select,
@@ -122,42 +96,8 @@
   border: 1px solid #d6d6d6;
   border-radius: 6px;
   background: #fff;
+  color: #111;
 }
 
-/* ---------- GUARDS: OVERRIDE COMMON COLLAPSERS ---------- */
-#settings-content,
-#settings-content * {
-  /* neutralize accidental collapsing rules from older CSS */
-  /* These are conservative and only touch height/overflow/visibility */
-  height: auto;
-  max-height: none;
-  overflow: visible;
-  visibility: inherit;
-}
-
-.settings-tab-content.active *,
-.tab-panel.active *,
-.library-tab-content.active *,
-.feedback-tab-content.active * {
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-/* Keep buttons sensible */
-#settings-content .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #cfcfcf;
-  background: #f8f8f8;
-  cursor: pointer;
-}
-
-#settings-content .btn.primary {
-  background: #0b6efd;
-  border-color: #0b6efd;
-  color: #fff;
-}
+/* ---------- DEBUG AID (remove later) ---------- */
+.settings-tab-content.active { outline: 2px solid rgba(0,128,255,.15); }
