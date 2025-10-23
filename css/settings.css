@@ -1,25 +1,48 @@
 /* =========================================
-   Icebreaking Machine — settings.css (v2)
-   Goal: Make Settings/Results/Feedback visible
-   Strategy: Display-only tab toggling, no opacity/visibility tricks
+   Icebreaking Machine — settings.css (v3)
+   Guarantees visible Settings/Results/Feedback content
    ========================================= */
+
+/* ---------- PAGE-LEVEL GUARDS ---------- */
+#settings-page,
+.page.settings-page,
+.app-page.settings-page {
+  display: block !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: calc(100vh - 64px);
+  position: relative;
+  z-index: 1;
+}
+
+/* Some themes hide content via content-visibility/filters/scale */
+#settings-page,
+#settings-page * {
+  content-visibility: visible !important;
+  contain: none !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: none !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
 
 /* ---------- ROOT CONTAINER ---------- */
 #settings-content {
   display: block !important;
-  position: relative;
-  z-index: 1;
-  background: #ffffff;       /* ensure contrast */
-  color: #111;               /* readable text */
+  position: relative !important;
+  z-index: 2;                 /* sit above any stray overlays */
+  background: #ffffff !important;
+  color: #111 !important;
   height: auto !important;
   max-height: none !important;
-  min-height: 480px;         /* visible even if panel is short */
+  min-height: 520px;          /* visible even if panel short */
   box-sizing: border-box;
-  font-size: 16px;           /* guard against parent font-size:0 */
-  filter: none !important;   /* neutralize accidental opacity filters */
+  font-size: 16px !important; /* guard against font-size:0 parents */
+  line-height: 1.35;
 }
 
-/* Optional layout wrapper if present */
+/* Optional wrapper */
 #settings-content .settings-inner,
 #settings-content .container,
 #settings-content .content {
@@ -30,32 +53,18 @@
   box-sizing: border-box;
 }
 
-/* ---------- TAB AREAS CAN GROW ---------- */
-.settings-tabs,
-.settings-tab-panels,
-.tab-panels,
-.tab-content-wrapper {
-  display: block !important;
-  height: auto !important;
-  max-height: none !important;
-  overflow: visible !important;
-}
-
-/* ---------- PANELS: BASE (HIDDEN) ----------
-   Keep this SIMPLE: we only toggle display.
-   No opacity, no visibility, no max-height animations.
-*/
+/* ---------- TAB PANELS: SIMPLE TOGGLE ---------- */
 .settings-tab-content,
 .tab-panel,
 .library-tab-content,
 .feedback-tab-content {
-  display: none !important;   /* hidden by default */
+  display: none !important;       /* hidden by default */
   height: auto !important;
   max-height: none !important;
   overflow: visible !important;
 }
 
-/* ---------- PANELS: ACTIVE (VISIBLE) ---------- */
+/* Visible panel */
 .settings-tab-content.active,
 .tab-panel.active,
 .library-tab-content.active,
@@ -63,30 +72,36 @@
   display: block !important;
   height: auto !important;
   max-height: none !important;
-  min-height: 260px;
+  min-height: 280px;
   background: transparent;
+  position: relative;
+  z-index: 3;                     /* on top */
 }
 
-/* ---------- HARD VISIBILITY GUARDS INSIDE ACTIVE PANELS ---------- */
+/* Inner guard: nothing inside the active panel can be hidden */
 .settings-tab-content.active,
 .settings-tab-content.active * {
   opacity: 1 !important;
   visibility: visible !important;
   filter: none !important;
+  transform: none !important;
+  color: #111 !important;
 }
 
-/* ---------- FORMS & BASICS ---------- */
-#settings-content form,
-#settings-content .form-section {
-  width: 100%;
-  height: auto;
-  max-height: none;
-  overflow: visible;
+/* ---------- COMMON OVERLAYS (neutralize if present) ---------- */
+.page-overlay,
+.loading-overlay,
+.modal-backdrop,
+#loading,
+#spinner {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
+/* ---------- FORMS ---------- */
 #settings-content label { display: block; font-weight: 600; margin: 8px 0 6px; }
-#settings-content .field { margin: 10px 0 16px; }
-
+#settings-content .form-group { margin: 10px 0 16px; }
 #settings-content input,
 #settings-content select,
 #settings-content textarea {
@@ -99,5 +114,5 @@
   color: #111;
 }
 
-/* ---------- DEBUG AID (remove later) ---------- */
-.settings-tab-content.active { outline: 2px solid rgba(0,128,255,.15); }
+/* ---------- DEBUG OUTLINE (remove later) ---------- */
+.settings-tab-content.active { outline: 2px dashed rgba(0,128,255,.25); }
