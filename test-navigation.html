@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .page {
+            display: none !important;
+            padding: 20px;
+            margin: 10px 0;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+        }
+        .page.active {
+            display: block !important;
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .nav-item {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .nav-item.active {
+            background: #2196f3;
+            color: white;
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Navigation Test</h1>
+    <p>This tests if the navigation and page visibility works correctly.</p>
+    
+    <div id="test-results"></div>
+    
+    <h2>Navigation</h2>
+    <div class="nav-item active" data-page="dashboard">Dashboard</div>
+    <div class="nav-item" data-page="settings">Settings</div>
+    <div class="nav-item" data-page="results">Results</div>
+    <div class="nav-item" data-page="feedback">Feedback</div>
+    
+    <h2>Pages</h2>
+    <div class="page active" id="dashboard-page">
+        <h3>Dashboard Page</h3>
+        <p>This is the dashboard content. You should see this by default.</p>
+    </div>
+    
+    <div class="page" id="settings-page">
+        <h3>Settings Page</h3>
+        <p style="background: #e74c3c; color: white; padding: 16px;">
+            ⚠️ DEBUG: Settings page is visible!
+        </p>
+        <p>If you can see this, the Settings page is showing correctly.</p>
+    </div>
+    
+    <div class="page" id="results-page">
+        <h3>Results Page</h3>
+        <p>This is the results content.</p>
+    </div>
+    
+    <div class="page" id="feedback-page">
+        <h3>Feedback Page</h3>
+        <p>This is the feedback content.</p>
+    </div>
+
+    <script>
+        // Test if CSS is working
+        function runTests() {
+            const results = [];
+            const resultsDiv = document.getElementById('test-results');
+            
+            // Test 1: Check if dashboard is visible
+            const dashboard = document.getElementById('dashboard-page');
+            const dashboardVisible = window.getComputedStyle(dashboard).display === 'block';
+            results.push({
+                test: 'Dashboard visible on load',
+                passed: dashboardVisible,
+                details: `Display: ${window.getComputedStyle(dashboard).display}`
+            });
+            
+            // Test 2: Check if settings is hidden
+            const settings = document.getElementById('settings-page');
+            const settingsHidden = window.getComputedStyle(settings).display === 'none';
+            results.push({
+                test: 'Settings hidden on load',
+                passed: settingsHidden,
+                details: `Display: ${window.getComputedStyle(settings).display}`
+            });
+            
+            // Display results
+            resultsDiv.innerHTML = '<h3>Test Results:</h3>';
+            results.forEach(result => {
+                resultsDiv.innerHTML += `
+                    <div class="test-result ${result.passed ? 'success' : 'error'}">
+                        ${result.passed ? '✅' : '❌'} ${result.test}<br>
+                        <small>${result.details}</small>
+                    </div>
+                `;
+            });
+        }
+        
+        // Initialize navigation
+        function initNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const pages = document.querySelectorAll('.page');
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    console.log('Clicked:', item.dataset.page);
+                    
+                    // Remove active from all
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    pages.forEach(page => {
+                        console.log('Removing active from:', page.id);
+                        page.classList.remove('active');
+                    });
+                    
+                    // Add active to clicked
+                    item.classList.add('active');
+                    const pageId = item.dataset.page;
+                    const targetPage = document.getElementById(`${pageId}-page`);
+                    
+                    if (targetPage) {
+                        targetPage.classList.add('active');
+                        console.log('Added active to:', pageId + '-page');
+                        console.log('Display style:', window.getComputedStyle(targetPage).display);
+                    } else {
+                        console.error('Page not found:', pageId + '-page');
+                    }
+                });
+            });
+        }
+        
+        // Run tests and init on load
+        window.addEventListener('DOMContentLoaded', () => {
+            runTests();
+            initNavigation();
+            console.log('Test page loaded');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icebreaking Machine - CRE Networking Intelligence Platform</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/chunk5-styles.css">
+    <link rel="stylesheet" href="css/settings.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <i class="fas fa-handshake logo-icon"></i>
+                <h1 class="logo-text">Icebreaking Machine</h1>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#research" class="nav-item" data-page="research">
+                <i class="fas fa-search"></i>
+                <span>Research Engine</span>
+            </a>
+            <a href="#results" class="nav-item" data-page="results">
+                <i class="fas fa-folder-open"></i>
+                <span>Results Library</span>
+            </a>
+            <a href="#settings" class="nav-item" data-page="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
+            <a href="#feedback" class="nav-item" data-page="feedback">
+                <i class="fas fa-comment-dots"></i>
+                <span>Feedback</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="user-profile" id="userProfile">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">John Anderson</div>
+                    <div class="user-role">CRE Professional</div>
+                </div>
+                <i class="fas fa-chevron-up profile-toggle-icon"></i>
+            </div>
+            <div class="profile-dropdown" id="profileDropdown">
+                <a href="#settings" class="profile-dropdown-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+                <a href="#" class="profile-dropdown-item" id="profileMenuItem">
+                    <i class="fas fa-user-circle"></i>
+                    <span>My Profile</span>
+                </a>
+                <a href="#" class="profile-dropdown-item" id="helpMenuItem">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help & Support</span>
+                </a>
+                <div class="profile-dropdown-divider"></div>
+                <a href="#" class="profile-dropdown-item" id="logoutMenuItem">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle" id="mobileMenuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Dashboard Page -->
+        <div class="page active" id="dashboard-page">
+            <div class="page-header">
+                <h2 class="page-title">Command Center</h2>
+                <p class="page-subtitle">Your comprehensive networking intelligence overview</p>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid" id="stats-grid">
+                <!-- Populated by DashboardUI -->
+            </div>
+
+            <!-- Recently Completed Research -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3 class="panel-title">
+                        <i class="fas fa-history"></i>
+                        Recently Completed Research
+                    </h3>
+                    <a href="#results" class="view-all-link" data-page="results">View All</a>
+                </div>
+                <div class="panel-content">
+                    <div class="recent-research-list" id="recent-research-list">
+                        <!-- Populated by DashboardUI -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Research Engine Page -->
+        <div class="page" id="research-page">
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title">Research Engine</h2>
+                    <p class="page-subtitle">Two-step process: Research → Approve → Generate Icebreakers</p>
+                </div>
+                <div class="header-actions">
+                    <button id="import-csv-btn" class="btn btn-secondary">
+                        <i class="fas fa-upload"></i> Import CSV
+                    </button>
+                    <button id="add-contact-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Contact
+                    </button>
+                </div>
+            </div>
+
+            <!-- Awaiting Approval Section -->
+            <div id="approval-section" style="display: none;">
+                <!-- Populated by ResearchUI -->
+            </div>
+
+            <!-- Batch Actions Bar (shown when contacts selected) -->
+            <div id="batch-actions" class="batch-actions" style="display: none;">
+                <div class="batch-info">
+                    <input type="checkbox" id="select-all">
+                    <label for="select-all"><span id="selected-count">0</span> contacts selected</label>
+                </div>
+                <div class="batch-buttons">
+                    <button id="batch-research-btn" class="btn btn-primary" onclick="contactUI?.handleBatchResearch()">
+                        <i class="fas fa-search"></i> Research (<span class="research-count">0</span>)
+                    </button>
+                    <button id="batch-delete-btn" class="btn btn-danger" onclick="contactUI?.handleBatchDelete()">
+                        <i class="fas fa-trash"></i> Delete (<span class="delete-count">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contact List -->
+            <div id="contacts-list" class="contacts-grid">
+                <!-- Contacts will be dynamically rendered here -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <i class="fas fa-users fa-4x"></i>
+                <h3>No Contacts Yet</h3>
+                <p>Add your first contact or import from CSV to get started</p>
+                <button class="btn btn-primary" id="empty-add-contact-btn">
+                    <i class="fas fa-plus"></i> Add Contact
+                </button>
+            </div>
+        </div>
+
+        <!-- Add/Edit Contact Modal -->
+        <div id="contact-modal" class="modal" style="display: none;">
+            <div class="modal-content slide-down">
+                <div class="modal-header">
+                    <h2 id="modal-title">Add Contact</h2>
+                    <button class="close-btn" id="close-contact-modal">&times;</button>
+                </div>
+                
+                <form id="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" name="full_name" required placeholder="John Smith">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Job Title</label>
+                            <input type="text" name="job_title" placeholder="Managing Partner">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company <span class="required">*</span></label>
+                            <input type="text" name="company" required placeholder="ABC Properties">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Contact Location</label>
+                            <input type="text" name="contact_location" placeholder="Nashville, TN">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Company Location</label>
+                            <input type="text" name="company_location" placeholder="Knoxville, TN">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Personal LinkedIn URL</label>
+                        <input type="url" name="personal_linkedin_url" placeholder="https://linkedin.com/in/johnsmith">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Company LinkedIn URL</label>
+                        <input type="url" name="company_linkedin_url" placeholder="https://linkedin.com/company/abc-properties">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Company Website</label>
+                        <input type="url" name="company_website" placeholder="https://company.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea name="notes" rows="3" placeholder="Additional context about this contact..."></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-contact-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="save-contact-btn">
+                            <span class="btn-text">Save Contact</span>
+                            <span class="spinner" style="display: none;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- CSV Import Modal -->
+        <div id="csv-import-modal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Import Contacts from CSV</h2>
+                    <button class="close-btn" id="close-csv-modal">&times;</button>
+                </div>
+                
+                <div class="import-instructions">
+                    <h3>CSV Format Requirements</h3>
+                    <p>Your CSV file should include these columns (Full Name and Company are required):</p>
+                    <ul>
+                        <li><strong>Full Name</strong> or <strong>First Name</strong> + <strong>Last Name</strong> (required)</li>
+                        <li><strong>Company</strong> (required)</li>
+                        <li>Title or Job Title</li>
+                        <li>Contact Location</li>
+                        <li>Company Location</li>
+                        <li>Personal LinkedIn</li>
+                        <li>Company LinkedIn</li>
+                        <li>Website</li>
+                        <li>Notes</li>
+                    </ul>
+                </div>
+                
+                <div id="drop-zone" class="drop-zone">
+                    <i class="fas fa-cloud-upload-alt fa-3x"></i>
+                    <p>Drag and drop CSV file here</p>
+                    <p class="small">or</p>
+                    <button type="button" class="btn btn-secondary" id="browse-file-btn">Browse Files</button>
+                    <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+                </div>
+                
+                <div id="import-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <p id="import-status">Processing...</p>
+                </div>
+                
+                <div id="import-results" style="display: none;">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="success-message"></span>
+                    </div>
+                    <div class="alert alert-warning" id="error-section" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="error-message"></span>
+                    </div>
+                </div>
+                
+                <div class="csv-example">
+                    <h4>Example CSV Format:</h4>
+                    <pre>Full Name,Company,Title,Contact Location,Personal LinkedIn
+John Smith,ABC Properties,Managing Partner,"Nashville, TN",https://linkedin.com/in/johnsmith
+Jane Doe,XYZ Realty,Broker,Atlanta GA,https://linkedin.com/in/janedoe</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keep existing Research Parameters panel (hidden for now) -->
+        <div style="display: none;">
+            <div class="research-container">
+                <div class="research-form-panel panel">
+
+                <div class="research-params-panel panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <i class="fas fa-filter"></i>
+                            Research Parameters
+                        </h3>
+                    </div>
+                    <div class="panel-content">
+                        <div class="form-group">
+                            <label>Research Depth</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="researchDepth" value="quick" checked>
+                                    <span>Quick Scan (2-3 min)</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="researchDepth" value="standard">
+                                    <span>Standard (5-7 min)</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="researchDepth" value="deep">
+                                    <span>Deep Dive (10-15 min)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Focus Areas</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="focusArea" value="transactions" checked>
+                                    <span>Recent Transactions</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="focusArea" value="social" checked>
+                                    <span>Social Media Activity</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="focusArea" value="news" checked>
+                                    <span>Industry News & Press</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="focusArea" value="connections">
+                                    <span>Mutual Connections</span>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="focusArea" value="interests">
+                                    <span>Personal Interests</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="additionalNotes">Additional Context (Optional)</label>
+                            <textarea id="additionalNotes" rows="4" placeholder="Add any specific information or context that might help generate better icebreakers..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="clearFormBtn">
+                                <i class="fas fa-redo"></i>
+                                Clear Form
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="startResearchBtn">
+                                <i class="fas fa-search"></i>
+                                Start Research
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Library Page -->
+        <div class="page" id="results-page" style="display: none;">
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title">Results Library</h2>
+                    <p class="page-subtitle" id="results-library-page"><span id="results-count">0</span> completed contacts</p>
+                </div>
+                <button id="export-csv-btn" class="btn btn-secondary">
+                    <i class="fas fa-download"></i>
+                    Export CSV
+                </button>
+            </div>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <strong>Tip:</strong> You can open the exported CSV directly in Google Sheets or Excel for further analysis.
+            </div>
+
+            <input type="text" id="search-results" placeholder="Search by contact name, company, or activity..." class="search-input">
+
+            <div id="results-table" class="results-container">
+                <!-- Populated by ResultsLibraryUI -->
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div class="page" id="settings-page" style="display: none;">
+            <div class="page-header">
+                <h2 class="page-title">Settings</h2>
+                <p class="page-subtitle">Customize your icebreaker generation and manage your account</p>
+            </div>
+
+            <!-- Settings Tab Navigation -->
+            <div class="settings-tabs">
+                <button class="settings-tab-btn active" data-tab="basics">
+                    <i class="fas fa-user-circle"></i> Basics
+                </button>
+                <button class="settings-tab-btn" data-tab="writing-style">
+                    <i class="fas fa-pen-fancy"></i> Writing Style
+                </button>
+                <button class="settings-tab-btn" data-tab="ai-prompts">
+                    <i class="fas fa-robot"></i> AI Prompts
+                </button>
+                <button class="settings-tab-btn" data-tab="billing">
+                    <i class="fas fa-credit-card"></i> Billing & Credits
+                </button>
+            </div>
+
+            <!-- Settings Tab Content Container -->
+            <div id="settings-content">
+                <!-- Content will be dynamically rendered by SettingsUI -->
+                
+                <!-- Tab 1: Basics (default rendered) -->
+                <div id="tab-basics" class="settings-tab-content active" data-tab-content="basics">
+                    <p style="text-align: center; padding: 40px; color: #657786;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 16px; display: block;"></i>
+                        Loading settings...
+                    </p>
+                </div>
+
+                <!-- Tab 2: Writing Style -->
+                <div id="tab-style" class="settings-tab-content" data-tab-content="writing-style">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Tab 3: AI Prompts -->
+                <div id="tab-prompts" class="settings-tab-content" data-tab-content="ai-prompts">
+                    <!-- Rendered by JS -->
+                </div>
+
+                <!-- Tab 4: Billing & Credits -->
+                <div id="tab-billing" class="settings-tab-content" data-tab-content="billing">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+            
+            <!-- Save Button -->
+            <div class="settings-footer">
+                <button id="save-all-settings" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    Save All Settings
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Page -->
+        <div class="page" id="feedback-page" style="display: none;">
+            <div class="page-header">
+                <h2 class="page-title">Feedback & Support</h2>
+                <p class="page-subtitle">We'd love to hear from you</p>
+            </div>
+
+            <div class="feedback-container">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <i class="fas fa-comment-alt"></i>
+                            Share Your Feedback
+                        </h3>
+                    </div>
+                    <div class="panel-content">
+                        <form id="feedbackForm">
+                            <div class="form-group">
+                                <label>Feedback Type</label>
+                                <div class="radio-group horizontal">
+                                    <label class="radio-label">
+                                        <input type="radio" name="feedbackType" value="feature" checked>
+                                        <span>Feature Request</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="feedbackType" value="bug">
+                                        <span>Bug Report</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="feedbackType" value="improvement">
+                                        <span>Improvement</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="feedbackType" value="general">
+                                        <span>General Feedback</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedbackSubject">Subject *</label>
+                                <input type="text" id="feedbackSubject" placeholder="Brief description of your feedback" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="feedbackMessage">Message *</label>
+                                <textarea id="feedbackMessage" rows="6" placeholder="Please provide detailed information about your feedback..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Priority Level</label>
+                                <select id="feedbackPriority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="critical">Critical</option>
+                                </select>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane"></i>
+                                    Submit Feedback
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="support-panel panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <i class="fas fa-headset"></i>
+                            Contact Support
+                        </h3>
+                    </div>
+                    <div class="panel-content">
+                        <div class="support-options">
+                            <div class="support-option">
+                                <div class="support-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="support-info">
+                                    <div class="support-label">Email Support</div>
+                                    <div class="support-value">support@icebreakingmachine.com</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="support-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="support-info">
+                                    <div class="support-label">Phone Support</div>
+                                    <div class="support-value">1-800-ICE-BREAK</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="support-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="support-info">
+                                    <div class="support-label">Support Hours</div>
+                                    <div class="support-value">Mon-Fri: 9AM - 6PM ET</div>
+                                </div>
+                            </div>
+                            <div class="support-option">
+                                <div class="support-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="support-info">
+                                    <div class="support-label">Knowledge Base</div>
+                                    <div class="support-value">
+                                        <a href="#" class="support-link">Browse Articles</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Action completed successfully</span>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedback-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Research Feedback</h2>
+                <button class="close-btn" id="close-feedback-modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p>Please provide specific feedback about the research findings for <strong id="feedback-contact-name"></strong>:</p>
+                
+                <form id="feedback-form">
+                    <div class="form-group">
+                        <label for="feedback-text">What's the issue?</label>
+                        <textarea id="feedback-text" rows="6" placeholder="Example: Too generic, not relevant to their current role, outdated information, doesn't provide a good conversation starter..." required></textarea>
+                    </div>
+                    
+                    <div class="feedback-suggestions">
+                        <p class="small">Common feedback:</p>
+                        <div class="suggestion-chips">
+                            <button type="button" class="chip" onclick="document.getElementById('feedback-text').value='Too generic, not specific enough'">Too Generic</button>
+                            <button type="button" class="chip" onclick="document.getElementById('feedback-text').value='Not relevant to their current role'">Not Relevant</button>
+                            <button type="button" class="chip" onclick="document.getElementById('feedback-text').value='Information appears outdated'">Outdated</button>
+                            <button type="button" class="chip" onclick="document.getElementById('feedback-text').value='Need more specific details'">Need More Details</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" id="cancel-feedback-btn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sync"></i> Re-research with Feedback
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/contact-manager.js"></script>
+    <script src="js/research-engine.js"></script>
+    <script src="js/research-ui.js"></script>
+    <script src="js/credit-tracker.js"></script>
+    <script src="js/feedback-ui.js"></script>
+    <script src="js/learning-engine.js"></script>
+    <script src="js/dashboard-ui.js"></script>
+    <script src="js/utils/export.js"></script>
+    <script src="js/utils/queue.js"></script>
+    <script src="js/results-ui.js"></script>
+    <script src="js/contact-ui.js"></script>
+    <script src="js/settings-model.js"></script>
+    <script src="js/prompt-defaults.js"></script>
+    <script src="js/settings-ui.js"></script>
+    <script src="js/prompt-builder.js"></script>
+    <script src="js/ai-client.js"></script>
+    <script src="js/icebreaker-engine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
